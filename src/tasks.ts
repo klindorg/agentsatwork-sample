@@ -1,10 +1,12 @@
+import { ValidationError } from './http.ts';
+
+export { ValidationError };
+
 export interface Task {
   id: number;
   title: string;
   done: boolean;
 }
-
-export class ValidationError extends Error {}
 
 /** The most characters a title may have, after trimming. */
 const MAX_TITLE_LENGTH = 200;
