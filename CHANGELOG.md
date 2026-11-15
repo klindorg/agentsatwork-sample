@@ -5,7 +5,7 @@ what it changes for someone who uses the API. CI checks that it did.
 
 ## Unreleased
 
-- Notes, next to the tasks: `POST /notes` with `{"text": "..."}` adds a note and answers 201 with it, `{"id": n, "text": "..."}`. The text is trimmed, must not be empty, and may be at most 500 characters; otherwise it answers 400 with an error. `GET /notes` lists every note in the order they were added, as `{"notes": [...]}`. `DELETE /notes/:id` removes a note and answers 204, or 404 with `not found`. The tasks API is unchanged.
+- Notes, next to the tasks: `POST /notes` with `{"text": "..."}` adds a note and answers 201 with it, `{"id": n, "text": "..."}`. The text is trimmed, must not be empty, and may be at most 500 characters; otherwise it answers 400 with an error. `GET /notes` lists every note in the order they were added, as `{"notes": [...]}`. `DELETE /notes/:id` removes a note and answers 204, or 404 with `not found`. The tasks API is unchanged. (#33)
 - `GET /tasks/count` also says what share of the tasks are done, as `donePercent`: a whole number from 0 to 100, rounded down, so 2 done out of 3 is 66. With no tasks it is 0. With `q` it counts only the tasks whose title contains it, like the other numbers. (#29)
 
 - `GET /tasks/oldest` answers 200 with the task that is not done and was added first, in the same shape as `GET /tasks/:id`. Renaming or reopening a task does not change when it was added. When every task is done, or there are none, it answers 404 with `no open task`. (#27)
