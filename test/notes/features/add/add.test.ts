@@ -32,6 +32,18 @@ describe('adding a note', () => {
     assert.equal(added.json!.text, 'a'.repeat(500));
   });
 
+  it('counts the 500 characters after trimming', async () => {
+    const added = await call('POST', '/notes', { text: `   ${'a'.repeat(500)}   ` });
+    assert.equal(added.status, 201);
+    assert.equal(added.json!.text, 'a'.repeat(500));
+  });
+
+  it('refuses text longer than 500 characters even when it has spaces to trim', async () => {
+    const before = store.all().length;
+    assert.deepEqual(await call('POST', '/notes', { text: ` ${'a'.repeat(501)} ` }), { status: 400, json: { error: 'text must be at most 500 characters' } });
+    assert.equal(store.all().length, before);
+  });
+
   it('refuses a note with no text, or text that is not text', async () => {
     const before = store.all().length;
     assert.deepEqual(await call('POST', '/notes', { text: '   ' }), { status: 400, json: { error: 'text must be text' } });
