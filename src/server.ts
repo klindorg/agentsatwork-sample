@@ -1,8 +1,19 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
-import { TaskList, ValidationError } from './tasks.ts';
+import { body, send, ValidationError, type Handler } from './http.ts';
+import { notes } from './notes/module.ts';
+import { TaskList } from './tasks.ts';
+
+/** Every module of the API besides the tasks, asked in turn, fresh for each server. A new module is one more line here. */
+function modules(): Handler[] {
+  return [notes()];
+}
 
 /**
- * The HTTP API over a task list:
+ * The HTTP API over a task list, and the modules next to it:
+ *
+ *   POST   /notes               add a note, body {"text": "..."}       (src/notes)
+ *   GET    /notes               every note, in the order they were added
+ *   DELETE /notes/:id           remove a note
  *
  *   GET    /health              is the server up
  *   GET    /tasks               every task, or with ?done=true or ?done=false only those that are or are not done,
@@ -23,21 +34,24 @@ import { TaskList, ValidationError } from './tasks.ts';
  *   POST   /tasks/:id/toggle    mark a task done if it is not, and not done if it is
  *   DELETE /tasks/:id           remove a task
  */
-export function createApp(tasks: TaskList = new TaskList()): Server {
+export function createApp(tasks: TaskList = new TaskList(), handlers: Handler[] = modules()): Server {
   return createServer((request, response) => {
-    handle(tasks, request, response).catch((error: unknown) => {
+    handle(tasks, handlers, request, response).catch((error: unknown) => {
       if (error instanceof ValidationError) send(response, 400, { error: error.message });
       else send(response, 500, { error: 'internal error' });
     });
   });
 }
 
-async function handle(tasks: TaskList, request: IncomingMessage, response: ServerResponse): Promise<void> {
+async function handle(tasks: TaskList, handlers: Handler[], request: IncomingMessage, response: ServerResponse): Promise<void> {
   const { pathname, searchParams } = new URL(request.url ?? '/', 'http://localhost');
   const parts = pathname.split('/').filter(Boolean);
   const method = request.method ?? 'GET';
 
   if (method === 'GET' && pathname === '/health') return send(response, 200, { status: 'ok' });
+
+  const route = { method, parts, query: searchParams, request, response };
+  for (const handler of handlers) if (await handler(route)) return;
 
   if (parts[0] !== 'tasks') return send(response, 404, { error: 'not found' });
 
@@ -106,25 +120,4 @@ function sortOrder(searchParams: URLSearchParams): 'title' | '-title' | undefine
   if (values.length === 1 && values[0] === 'title') return 'title';
   if (values.length === 1 && values[0] === '-title') return '-title';
   throw new ValidationError('sort must be title or -title');
-}
-
-async function body(request: IncomingMessage): Promise<Record<string, unknown>> {
-  const chunks: Buffer[] = [];
-  for await (const chunk of request) chunks.push(chunk as Buffer);
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(Buffer.concat(chunks).toString('utf8'));
-  } catch {
-    throw new ValidationError('the body must be JSON');
-  }
-  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) throw new ValidationError('the body must be a JSON object');
-  return parsed as Record<string, unknown>;
-}
-
-function send(response: ServerResponse, status: number, payload?: unknown): void {
-  if (payload === undefined) {
-    response.writeHead(status).end();
-    return;
-  }
-  response.writeHead(status, { 'content-type': 'application/json' }).end(JSON.stringify(payload));
 }
