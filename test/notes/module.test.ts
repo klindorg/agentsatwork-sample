@@ -4,20 +4,12 @@ import { addNote } from '../../src/notes/features/add/add.ts';
 import { deleteNote } from '../../src/notes/features/delete/delete.ts';
 import { listNotes } from '../../src/notes/features/list/list.ts';
 import { NoteStore } from '../../src/notes/store.ts';
-import { startApp } from '../support.ts';
-import { startAppWith } from './support.ts';
-
-/**
- * The route table in src/notes/module.ts lists no features yet, so the server answers 404 for every
- * notes endpoint. These tests check what the spec asks of the served API; they are marked todo until
- * the features are wired in, and the marker should go then.
- */
-const UNTIL_WIRED = { todo: 'src/notes/module.ts does not list the notes features yet' };
+import { startApp, startAppWith } from '../support.ts';
 
 describe('the notes module, as the server serves it', () => {
   const call = startApp();
 
-  it('adds a note, lists it, and deletes it', UNTIL_WIRED, async () => {
+  it('adds a note, lists it, and deletes it', async () => {
     const added = await call('POST', '/notes', { text: '  Buy milk  ' });
     assert.equal(added.status, 201);
     const id = added.json!.id as number;
@@ -29,7 +21,7 @@ describe('the notes module, as the server serves it', () => {
     assert.deepEqual(await call('DELETE', `/notes/${id}`), { status: 404, json: { error: 'not found' } });
   });
 
-  it('refuses a bad note with 400 and does not list it', UNTIL_WIRED, async () => {
+  it('refuses a bad note with 400 and does not list it', async () => {
     const before = await call('GET', '/notes');
     assert.equal(before.status, 200);
     assert.deepEqual(await call('POST', '/notes', { text: '   ' }), { status: 400, json: { error: 'text must be text' } });
@@ -37,7 +29,7 @@ describe('the notes module, as the server serves it', () => {
     assert.deepEqual(await call('GET', '/notes'), before);
   });
 
-  it('keeps notes and tasks apart', UNTIL_WIRED, async () => {
+  it('keeps notes and tasks apart', async () => {
     const task = (await call('POST', '/tasks', { title: 'A task' })).json!;
     const note = (await call('POST', '/notes', { text: 'A note' })).json!;
 

@@ -9,7 +9,11 @@ function modules(): Handler[] {
 }
 
 /**
- * The HTTP API over a task list:
+ * The HTTP API over a task list, and the modules next to it:
+ *
+ *   POST   /notes               add a note, body {"text": "..."}       (src/notes)
+ *   GET    /notes               every note, in the order they were added
+ *   DELETE /notes/:id           remove a note
  *
  *   GET    /health              is the server up
  *   GET    /tasks               every task, or with ?done=true or ?done=false only those that are or are not done,

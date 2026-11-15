@@ -1,6 +1,6 @@
 # agentsatwork-sample
 
-A small task list API over HTTP, kept in memory. It is the sample target repository for
+A small task list API over HTTP, with notes next to the tasks, kept in memory. It is the sample target repository for
 AgentsAtWork: the repository the pipeline opens pull requests against in its own end-to-end test
 and in an adopter's first run. It is small on purpose, so a job is cheap and fast.
 
@@ -22,6 +22,20 @@ and in an adopter's first run. It is small on purpose, so a job is cheap and fas
 
 A title is at most 200 characters, after leading and trailing spaces are trimmed. Adding or
 renaming a task with a longer title answers 400 and changes nothing.
+
+### Notes
+
+Notes live next to the tasks and are kept apart from them: a note has an `id` and a `text`, and
+its ids are its own.
+
+| Method | Path | What it does |
+|---|---|---|
+| POST | `/notes` | Adds a note, body `{"text": "..."}`, and answers 201 with it: `{"id": n, "text": "..."}` |
+| GET | `/notes` | Lists every note, in the order they were added: `{"notes": [...]}` |
+| DELETE | `/notes/:id` | Removes a note and answers 204, or 404 with `{"error": "not found"}` when there is no such note |
+
+The text is trimmed of leading and trailing spaces, must not then be empty, and may be at most 500
+characters. Otherwise `POST /notes` answers 400 with an error and adds nothing.
 
 ## Working on it
 

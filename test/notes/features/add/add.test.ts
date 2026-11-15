@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { addNote } from '../../../../src/notes/features/add/add.ts';
 import { NoteStore } from '../../../../src/notes/store.ts';
-import { startAppWith } from './support.ts';
+import { startAppWith } from '../../../support.ts';
 
 describe('adding a note', () => {
   const store = new NoteStore();

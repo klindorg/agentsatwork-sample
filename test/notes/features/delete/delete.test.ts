@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { deleteNote } from '../../../../src/notes/features/delete/delete.ts';
 import { NoteStore } from '../../../../src/notes/store.ts';
-import { startAppWith } from './support.ts';
+import { startAppWith } from '../../../support.ts';
 
 describe('deleting a note', () => {
   const store = new NoteStore();
