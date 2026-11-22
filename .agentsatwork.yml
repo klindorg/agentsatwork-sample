@@ -13,6 +13,8 @@ commands:
   test: npm test
   # How long any one command may run, in minutes, before it is killed.
   timeout_min: 10
+  # The suite takes seconds, so the engineer runs all of it once before it finishes a session.
+  whole_suite_in_session: true
 
 # This repository has no database.
 migrations: { enabled: false }
