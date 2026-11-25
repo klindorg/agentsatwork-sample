@@ -11,10 +11,16 @@ commands:
   # Each is one line, run through a shell. The build line installs dependencies.
   build: npm ci && npm run build
   test: npm test
+  # Runs only the given test files, for the proof that a job's tests check its change.
+  test_files: node --test {files}
   # How long any one command may run, in minutes, before it is killed.
   timeout_min: 10
   # The suite takes seconds, so the engineer runs all of it once before it finishes a session.
   whole_suite_in_session: true
+
+# Which files are tests, for the proof: everything under test/, the shared helpers included, so
+# undoing a change to code never undoes a helper the tests use.
+test_paths: ["test/**"]
 
 # This repository has no database.
 migrations: { enabled: false }
