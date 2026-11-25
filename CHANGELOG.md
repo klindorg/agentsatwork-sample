@@ -5,6 +5,7 @@ what it changes for someone who uses the API. CI checks that it did.
 
 ## Unreleased
 
+- No change to the API: `.agentsatwork.yml` tells AgentsAtWork how to run only the given test files, and which files are tests, for its proof that a job's tests check its change. (#35)
 - No change to the API: `.agentsatwork.yml` tells AgentsAtWork that its engineer runs the whole test suite once before it finishes a session. (#34)
 - Notes, next to the tasks: `POST /notes` with `{"text": "..."}` adds a note and answers 201 with it, `{"id": n, "text": "..."}`. The text is trimmed, must not be empty, and may be at most 500 characters; otherwise it answers 400 with an error. `GET /notes` lists every note in the order they were added, as `{"notes": [...]}`. `DELETE /notes/:id` removes a note and answers 204, or 404 with `not found`. The tasks API is unchanged. (#33)
 - `GET /tasks/count` also says what share of the tasks are done, as `donePercent`: a whole number from 0 to 100, rounded down, so 2 done out of 3 is 66. With no tasks it is 0. With `q` it counts only the tasks whose title contains it, like the other numbers. (#29)
